@@ -10,7 +10,7 @@
 
 ```
 DASM (Doe'ian Assembly) is a simple preprocessor made in c++ that inputs .DASM files and outputs .ASM files!
-It plays the nicest with NASM and it's heavily biased towards it.
+It plays the nicest with NASM and it's heavily biased towards it. THIS IS NOT dasm FOR 6502 AND IS IN NO WAY RELATED TO IT!
 
 Q: Why use DASM?
 A: Because we added IF, ELIF, ELSE, WHILE with & as depth indicator! 
