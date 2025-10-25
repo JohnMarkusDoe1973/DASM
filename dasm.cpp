@@ -30,7 +30,15 @@ if(o=="ULT"){v=(unsigned long long)x<(unsigned long long)y;return 1;}if(o=="ULE"
 static string jmpfalse(const string&o,bool u){if(!u){if(o=="==")return"jne";if(o=="!=")return"je";if(o==">")return"jle";if(o=="<")return"jge";if(o==">=")return"jl";if(o=="<=")return"jg";}
 else{if(o=="UGT")return"jbe";if(o=="UGE")return"jb";if(o=="ULT")return"jae";if(o=="ULE")return"ja";}return"jne";}
 
-static void emitx(const string&s){out_thing.push_back(s);}
+static string commentz;
+
+static void emitx(string s){
+	if (!commentz.empty()) {
+		s += " " + commentz;
+		commentz.clear();
+	}
+	out_thing.push_back(s);
+}
 static void close_blk(const Bx&b){if(b.t==Bx::I){emitx(b.le+":");emitx(b.lend+":");}else if(b.t==Bx::E){emitx(b.lend+":");}else{emitx(string("jmp ")+b.lh);emitx(b.lend+":");}}
 static void close_til(int d){while(!stk.empty()&&stk.back().d>=d){auto b=stk.back();stk.pop_back();close_blk(b);}}
 static bool readfilex(const string&p,vector<string>&v){ifstream f(p);if(!f)return 0;string s;while(getline(f,s))v.push_back(s);return 1;}
@@ -42,16 +50,33 @@ int main(int argc,char**argv){
     if(!readfilex(fname,file_lines)){cerr<<"cant open\n";return 2;}
     for(lnum=0;lnum<(int)file_lines.size();++lnum){
         string raw=file_lines[lnum], line=raw;
-        int i=0,dep=0;while(i<(int)line.size()){if(line[i]=='&'){++dep;++i;while(i<(int)line.size()&&line[i]==' ')++i;}else if(line[i]==' ')++i;else break;}
-        string body=trimx(line.substr(i));
+        int i=0, dep=0;
+		while (i<(int)line.size()) {
+			if (line[i]=='&') { ++dep; ++i; while (i<(int)line.size() && line[i]==' ') ++i; }
+			else if (line[i]==' ') { ++i; }
+			else break;
+		}
+		string aftdpth = line.substr(i);
+		size_t cs = aftdpth.find(';'); // Like csgo... right? ha, ha.
+		string comment, body;
+		
+		if (cs != string::npos) {
+			comment = aftdpth.substr(cs);
+			body = trimx(aftdpth.substr(0,cs));
+		} else {
+			body = trimx(aftdpth);
+		}
+		
+        //string body=trimx(line.substr(i));
         close_til(dep+1);
-        if(body.empty()||body[0]==';'){emitx(raw);continue;}
+        if (body.empty()) { if(!comment.empty()) emitx(comment); else emitx(""); continue;}
         size_t sp=body.find_first_of(" \t");
         string head=lowerme(sp==string::npos?body:body.substr(0,sp));
         string rest=trimx(body.substr(head.size()));
 
         if(head=="if"||head=="elif"||head=="else"||head=="while"||head=="end"){
-            int dd=dep;
+            if (!comment.empty()) commentz = comment;
+			int dd=dep;
             if(head=="if"){
                 auto c=parse_if(rest);if(!c){cerr<<"bad if\n";return 3;}
                 string L1=make_lbl("if_else"),L2=make_lbl("if_end");bool v=0;
@@ -93,7 +118,9 @@ int main(int argc,char**argv){
                 auto b=stk.back();stk.pop_back();close_blk(b);continue;
             }
         }
-        emitx(body);
+        if (!comment.empty()) emitx(body + " " + comment);
+		else emitx(body);
+		continue;
     }
     close_til(0);
     for(auto&s:out_thing)cout<<s<<"\n";
