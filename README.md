@@ -1,8 +1,27 @@
-# DASM - a preprocessor for assembly made in c++.
+# DASM - a C++ preprocessor for assembly.
 
-Here in DASM we added such things as...
-IF, ELIF, ELSE, WHILE with &'s as whitespace!
+```
+  _____           _____ __  __ 
+ |  __ \   /\    / ____|  \/  |
+ | |  | | /  \  | (___ | \  / |
+ | |  | |/ /\ \  \___ \| |\/| |
+ | |__| / ____ \ ____) | |  | |
+ |_____/_/    \_\_____/|_|  |_|
 
+```
+DASM (Doe'ian Assembly) is a simple preprocessor made in c++ that inputs .DASM files and outputs .ASM files!
+It plays the nicest with NASM and it's heavily biased towards it.
+
+Q: Why use DASM?
+A: Because we added IF, ELIF, ELSE, WHILE with & as depth indicator! 
+Q: Why &?
+A: It's fancy. And simple.
+
+TO RUN:
+build DASM.cpp or get the .exe for windows (tested on windows 8.1) and run the following in CMD:
+```bash
+dasm.exe INPUTFILE.dasm
+```
 example:
 ```asm
 IF RCX > 10
